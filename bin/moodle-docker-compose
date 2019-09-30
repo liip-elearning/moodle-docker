@@ -88,4 +88,4 @@ if [[ "$(uname)" == "Darwin" ]]; then
 fi
 
 
-$dockercompose $@
+$dockercompose "$@"
