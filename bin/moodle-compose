@@ -1,8 +1,12 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 set -e
 
-MOODLE_DOCKER_BINDIR=$(dirname $0)
+# Get the directory of this script (even if the script is called through a symlink)
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ] ; do SOURCE="$(readlink "$SOURCE")"; done
+MOODLE_DOCKER_BINDIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+
 MOODLE_DOCKER_DIR=$(realpath $(dirname $MOODLE_DOCKER_BINDIR))
 
 # Check that the config.docker-template.php exists in the directory

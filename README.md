@@ -16,6 +16,27 @@ This repository contains Docker configuration aimed at Moodle developers and tes
 * [Docker](https://docs.docker.com) and [Docker Compose](https://docs.docker.com/compose/) installed
 * 3.25GB of RAM (if you choose [Microsoft SQL Server](https://docs.microsoft.com/en-us/sql/linux/sql-server-linux-setup#prerequisites) as db server)
 
+## Liip Quick start
+```bash
+# Clone this repository
+git clone https://github.com/liip-elearning/moodle-docker.git ~/opt/
+
+# Symlink the moodle-compose script to any directory included in your $PATH
+ln -s ~/opt/moodle-docker/bin/moodle-compose ~/.local/bin/
+
+# Go to your Moodle directory and fire up all containers
+moodle-compose up -d
+
+# To stop all containers
+moodle-compose down
+
+# To destroy all containers but keep volumes and networks
+moodle-compose rm -s
+
+# To destroy all containers, volumes and networks
+moodle-compose down
+```
+
 ## Quick start
 
 ```bash
