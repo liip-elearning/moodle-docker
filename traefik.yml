@@ -7,21 +7,21 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.frontend.rule=Host:${MOODLE_DOCKER_WEB_HOST}"
-      - 'traefik.docker.network=traefik_default'
+      - 'traefik.docker.network=pontsun'
     networks:
       - default
-      - traefik
+      - pontsun
   exttests:
     networks:
       - default
-      - traefik
+      - pontsun
   selenium:
     networks:
       - default
-      - traefik
+      - pontsun
 
 networks:
   default:
-  traefik:
+  pontsun:
     external:
-      name: traefik_default
+      name: pontsun
