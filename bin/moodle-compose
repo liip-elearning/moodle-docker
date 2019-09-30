@@ -28,8 +28,8 @@ if [ -r "$HOME/.moodle-compose.env" ]; then
 fi
 
 # Moodle instance settings
-if [ -r "$MOODLE_DOCKER_WWWROOT/.moodle-compose.env" ]; then
-    . $MOODLE_DOCKER_WWWROOT/.moodle-compose.env
+if [ -r "$MOODLE_DOCKER_WWWROOT/projectinfo.yml" ]; then
+    MOODLE_CODENAME=$(grep -e  '^codename' "$MOODLE_DOCKER_WWWROOT/projectinfo.yml" | awk -F ': ' '{print $2}')
 fi
 
 if [ -z "${MOODLE_CODENAME}" ]; then
