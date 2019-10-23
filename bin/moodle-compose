@@ -57,7 +57,7 @@ if ! [ -r ./config.php ] || ! diff -q $MOODLE_DOCKER_DIR/config.docker-template.
     cp $MOODLE_DOCKER_DIR/config.docker-template.php ./config.php
 fi
 
-ARGS=$@
+ARGS=
 
 if [ -n "$1" ]; then
     case $1 in
@@ -70,16 +70,18 @@ if [ -n "$1" ]; then
         ARGS="$ARGS --adminemail=admin@${MOODLE_DOCKER_WEB_HOST}"
         ARGS="$ARGS --adminuser=admin"
         ARGS="$ARGS --adminpass=adminadmin"
+        shift 1
         ;;
     upgrade|u)
         ARGS="exec webserver php admin/cli/upgrade.php"
         ARGS="$ARGS --non-interactive"
+        shift 1
         ;;
     purge_caches|pc)
         ARGS="exec webserver php admin/cli/purge_caches.php"
+        shift 1
         ;;
     esac
 fi
 
-
-$MOODLE_DOCKER_DIR/bin/moodle-docker-compose $ARGS
+$MOODLE_DOCKER_DIR/bin/moodle-docker-compose $ARGS "$@"
