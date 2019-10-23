@@ -18,8 +18,8 @@ This repository contains Docker configuration aimed at Moodle developers and tes
 
 ## Liip Quick start
 ```bash
-# Clone this repository
-git clone https://github.com/liip-elearning/moodle-docker.git ~/opt/
+# Clone this repository somewhere (we will be using ~/opt/moodle-docker, adapt the commands if you clone it somewhere else)
+git clone https://github.com/liip-elearning/moodle-docker.git ~/opt/moodle-docker
 
 # Symlink the moodle-compose script to any directory included in your $PATH
 ln -s ~/opt/moodle-docker/bin/moodle-compose ~/.local/bin/
