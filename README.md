@@ -37,6 +37,21 @@ moodle-compose rm -s
 moodle-compose down
 ```
 
+In addition to all docker-compose commands listed above, you also get:
+```bash
+# Run Moodle installation
+moodle-compose install
+moodle-compose i
+
+# Run Moodle upgrade
+moodle-compose upgrade
+moodle-compose u
+
+# Purge Moodle caches
+moodle-compose purge_caches
+moodle-compose pc
+```
+
 ## Quick start
 
 ```bash
