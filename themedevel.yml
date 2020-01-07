@@ -15,6 +15,13 @@ services:
       - MOODLE_DOCKER_THEMEDEVEL=${MOODLE_DOCKER_THEMEDEVEL}
       - MOODLE_DOCKER_BROWSERSYNC_WEBHOST=browsersync.${MOODLE_DOCKER_WEB_HOST}
       - MOODLE_DOCKER_WEBSERVER_INTERNAL=webserver_for_themedevel
+    labels:
+      - "traefik.enable=true"
+      - "traefik.frontend.rule=Host:browsersync.${MOODLE_DOCKER_WEB_HOST}"
+      - 'traefik.docker.network=pontsun'
+    networks:
+      - default
+      - pontsun
   webserver:
     environment:
       - MOODLE_DOCKER_THEMEDEVEL=${MOODLE_DOCKER_THEMEDEVEL}
