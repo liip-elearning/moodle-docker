@@ -30,6 +30,7 @@ fi
 # Moodle instance settings
 if [ -r "$MOODLE_DOCKER_WWWROOT/projectinfo.yml" ]; then
     MOODLE_CODENAME=$(grep -e  '^codename' "$MOODLE_DOCKER_WWWROOT/projectinfo.yml" | awk -F ': ' '{print $2}')
+    MOODLE_DOCKER_THEMEDEVEL=$(grep -e  '^themedevel' "$MOODLE_DOCKER_WWWROOT/projectinfo.yml" | awk -F ': ' '{print $2}')
 fi
 
 if [ -z "${MOODLE_CODENAME}" ]; then
@@ -41,6 +42,7 @@ if [ -z "${MOODLE_CODENAME}" ]; then
 fi
 
 export MOODLE_CODENAME=${MOODLE_CODENAME}
+export MOODLE_DOCKER_THEMEDEVEL=${MOODLE_DOCKER_THEMEDEVEL:-}
 
 # Related to Moodle
 export MOODLE_DOCKER_DB=${MOODLE_DOCKER_DB:-pgsql}
