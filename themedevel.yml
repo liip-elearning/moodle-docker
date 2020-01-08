@@ -6,6 +6,8 @@ services:
       - webserver
     volumes:
       - "${MOODLE_DOCKER_WWWROOT}:/var/www/html"
+      - "/var/www/html/theme/${MOODLE_DOCKER_THEMEDEVEL}/node_modules"
+      - "themebuild:/var/www/html/theme/${MOODLE_DOCKER_THEMEDEVEL}/build"
     working_dir: /var/www/html/theme/${MOODLE_DOCKER_THEMEDEVEL}
     command: bash -c "npm install && npm run start"
     ports:
@@ -30,3 +32,7 @@ services:
       default:
           aliases:
               - webserver_for_themedevel
+    volumes:
+      - "themebuild:/var/www/html/theme/${MOODLE_DOCKER_THEMEDEVEL}/build"
+volumes:
+    themebuild:
