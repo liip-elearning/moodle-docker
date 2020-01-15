@@ -84,6 +84,9 @@ if [ -n "$1" ]; then
         ARGS="exec webserver php admin/cli/purge_caches.php"
         shift 1
         ;;
+    moodle-plugin-ci|ci)
+        exec $MOODLE_DOCKER_DIR/bin/moodle-plugin-ci
+        ;;
     esac
 fi
 
