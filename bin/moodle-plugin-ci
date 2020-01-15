@@ -1,47 +1,6 @@
 #!/usr/bin/env bash
 set -e
 
-# Personal settings.
-if [ -r "$HOME/.moodle-compose.env" ]; then
-    . $HOME/.moodle-compose.env
-fi
-
-# Moodle instance settings
-if [ -r "$MOODLE_DOCKER_WWWROOT/projectinfo.yml" ]; then
-    MOODLE_CODENAME=$(grep -e  '^codename' "$MOODLE_DOCKER_WWWROOT/projectinfo.yml" | awk -F ': ' '{print $2}')
-fi
-
-FILE_PLUGINS="plugins.txt"
-# Check that we have a plugin list to check
-if [ ! -f $FILE_PLUGINS ]; then
-  echo-red "No $FILE_PLUGINS file found in $(pwd)."
-  exit 0
-fi
-
-
-FILE_CHECKS="checks.txt"
-# Check that we have a list of check to run
-if [ ! -f $FILE_CHECKS ]; then
-  echo-red "No $FILE_CHECKS file found in $(pwd)."
-  exit 0
-fi
-
-
-function join_by {
-  local IFS="$1"; shift; echo "$*";
-}
-
-
-lower_case()
-{
-    echo "$1" | tr '[:upper:]' '[:lower:]'
-}
-
-get_docker_webserver_name()
-{
-docker ps --filter "label=com.docker.compose.service=webserver" --filter "label=com.docker.compose.project=$(lower_case $MOODLE_CODENAME)" --format '{{.Names}}'
-}
-
 # Console colors
 red='\033[0;91m'
 red_bg='\033[101m'
@@ -62,6 +21,60 @@ echo-red ()      { echo -e "${red}$1${NC}"; }
 echo-green ()    { echo -e "${green}$1${NC}"; }
 echo-green-bg () { echo -e "${green_bg}$1${NC}"; }
 echo-yellow ()   { echo -e "${yellow}$1${NC}"; }
+
+# Personal settings.
+if [ -r "$HOME/.moodle-compose.env" ]; then
+    . $HOME/.moodle-compose.env
+fi
+
+# Moodle instance settings
+if [ -r "$MOODLE_DOCKER_WWWROOT/projectinfo.yml" ]; then
+    MOODLE_CODENAME=$(grep -e  '^codename' "$MOODLE_DOCKER_WWWROOT/projectinfo.yml" | awk -F ': ' '{print $2}')
+fi
+
+FILE_PLUGINS="plugins.txt"
+# Check that we have a plugin list to check
+if [ ! -f $FILE_PLUGINS ]; then
+  echo-red "No $FILE_PLUGINS file found in $(pwd)."
+  exit 0
+fi
+
+
+FILE_CHECKS="checks.txt"
+FILE_CHECKS_DIST="/tmp/checks.txt.dist"
+# Check that we have a list of check to run
+if [ ! -f $FILE_CHECKS ]; then
+  echo-red "No $FILE_CHECKS file found in $(pwd). Run the following command: "
+  echo-yellow "cp ${FILE_CHECKS_DIST} ${FILE_CHECKS}"
+  echo "phplint" > $FILE_CHECKS_DIST
+  echo "phpcpd" >> $FILE_CHECKS_DIST
+  echo "phpmd" >> $FILE_CHECKS_DIST
+  echo "codechecker" >> $FILE_CHECKS_DIST
+  echo "validate" >> $FILE_CHECKS_DIST
+  echo "savepoints" >> $FILE_CHECKS_DIST
+  echo "mustache" >> $FILE_CHECKS_DIST
+  echo "grunt" >> $FILE_CHECKS_DIST
+  echo "phpdoc" >> $FILE_CHECKS_DIST
+  echo "phpunit --coverage-text" >> $FILE_CHECKS_DIST
+  echo "behat --profile chrome" >> $FILE_CHECKS_DIST
+  exit 0
+fi
+
+
+function join_by {
+  local IFS="$1"; shift; echo "$*";
+}
+
+
+lower_case()
+{
+    echo "$1" | tr '[:upper:]' '[:lower:]'
+}
+
+get_docker_webserver_name()
+{
+docker ps --filter "label=com.docker.compose.service=webserver" --filter "label=com.docker.compose.project=$(lower_case $MOODLE_CODENAME)" --format '{{.Names}}'
+}
 
 # Nasty portable way to the directory of this script, following symlink,
 # because readlink -f not on OSX. Thanks stack overflow..
@@ -86,7 +99,7 @@ function moodle_plugin_ci
 
 MOODLE_CI_REPO_URL=${MOODLE_CI_REPO_URL:=https://github.com/ragusa87/moodle-plugin-ci}
 MOODLE_CI_REPO_BRANCH=${MOODLE_CI_REPO_BRANCH:=localmdl}
-NVM_VERSION=${NVM_VERSION:=v8.16.1}
+NVM_VERSION=${NVM_VERSION:=v8.9.0} # Use v 8.9.0 for mdl34, 8.16.1 for mdl35
 DOCKER_WEBSERVER_NAME=$(get_docker_webserver_name)
 
 SKIP_SETUP=${SKIP_SETUP:=0}
@@ -106,12 +119,13 @@ if [ $SKIP_SETUP -eq 0 ]; then
   fi
 
   # Copy Moodle-plugin-ci into docker
-  ./bin/moodle-compose exec webserver mkdir -p $MOODLE_CI_INTERNAL_DIR
+  moodle-compose exec webserver mkdir -p $MOODLE_CI_INTERNAL_DIR
   docker cp $MOODLE_CI_DIR $DOCKER_WEBSERVER_NAME:$MOODLE_CI_INTERNAL_DIR/
 
   # Install git (TODO Move this in the dockerfile)
   docker exec $DOCKER_WEBSERVER_NAME bash -c "(! [ -x \"\$(command -v git)\" ] && (apt-get update && apt-get install -y git)) || true"
-  # Install NPM >=8.9.0 <9.0.0 (TODO Move this in the dockerfile)
+
+  # Install NPM (TODO Move this in the dockerfile)
   docker exec $DOCKER_WEBSERVER_NAME bash -c "(! [ -d ~/.nvm ] && curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.0/install.sh | bash) || true"
   docker exec $DOCKER_WEBSERVER_NAME bash -lc "nvm install $NVM_VERSION && nvm use $NVM_VERSION"
 
@@ -124,9 +138,11 @@ fi
 # Write the list of plugin to "install" for Moodle-plugin-ci
 EXTRA_PLUGINS=$MOODLE_CI_INTERNAL_DIR/moodle-ci/plugins/
 moodle-compose exec webserver mkdir -p $EXTRA_PLUGINS
-docker cp plugins.txt $DOCKER_WEBSERVER_NAME:$EXTRA_PLUGINS
+docker cp $FILE_PLUGINS $DOCKER_WEBSERVER_NAME:$EXTRA_PLUGINS
+
 MOODLE_DIR=/var/www/html
 
+# Moodle install.
 if [ $SKIP_SETUP -eq 0 ]; then
   # Erase the previous DB
   moodle-compose exec webserver php admin/tool/phpunit/cli/util.php  --drop 2>&1 1>/dev/null || true
@@ -149,21 +165,23 @@ fi
 EXIT_STATUS=0
 PLUGINS_FOUND=0
 CHECKS_DONE=0
-while read -r plugin; do
+
+while read -r plugin <&3; do
     PLUGINS_FOUND=1
-    echo-yellow "Checking $plugin"
-    while IFS= read -r checks; do
+    echo-yellow "Plugin $plugin"
+    while read -r checks <&4; do
       CHECKS_DONE=1
-      moodle_plugin_ci ${checks} ${MOODLE_DIR}/${plugin}
-      LOCAL_EXIT_STATUS=$?
+      echo-yellow "Check $checks"
+      LOCAL_EXIT_STATUS=0
+      moodle_plugin_ci ${checks} ${MOODLE_DIR}/${plugin} || LOCAL_EXIT_STATUS=$?
       if [ $LOCAL_EXIT_STATUS -ne 0 ]; then
         EXIT_STATUS=$LOCAL_EXIT_STATUS
         echo-red "${checks} exited ${LOCAL_EXIT_STATUS}."
       else
         echo-green "${checks} OK"
       fi
-    done < "$(pwd)/$FILE_CHECKS"
-done < "$(pwd)/$FILE_PLUGINS"
+    done 4< "$(pwd)/$FILE_CHECKS"
+done 3< "$(pwd)/$FILE_PLUGINS"
 
 if [ $CHECKS_DONE -eq 0 ]; then
   echo "No check done. Please write a list of check to do in $FILE_CHECKS in the root of your project."
@@ -174,4 +192,9 @@ if [ $PLUGINS_FOUND -eq 0 ]; then
   echo "No plugins marked for checking. Please write a list of check to do in $FILE_PLUGINS in the root of your project."
   cat $FILE_PLUGINS
 fi
+
+if [ $EXIT_STATUS -ne 0 ]; then
+  echo-red "At least one of the check failed"
+fi
+
 exit $EXIT_STATUS
