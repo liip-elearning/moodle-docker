@@ -37,6 +37,21 @@ moodle-compose rm -s
 moodle-compose down
 ```
 
+In addition to all docker-compose commands listed above, you also get:
+```bash
+# Run Moodle installation
+moodle-compose install
+moodle-compose i
+
+# Run Moodle upgrade
+moodle-compose upgrade
+moodle-compose u
+
+# Purge Moodle caches
+moodle-compose purge_caches
+moodle-compose pc
+```
+
 ## Quick start
 
 ```bash
@@ -146,7 +161,7 @@ You can change the configuration of the docker images by setting various environ
 |-------------------------------------------|-----------|---------------------------------------|---------------|------------------------------------------------------------------------------|
 | `MOODLE_DOCKER_DB`                        | yes       | pgsql, mariadb, mysql, mssql, oracle  | none          | The database server to run against                                           |
 | `MOODLE_DOCKER_WWWROOT`                   | yes       | path on your file system              | none          | The path to the Moodle codebase you intend to test                           |
-| `MOODLE_DOCKER_PHP_VERSION`               | no        | 7.3, 7.2, 7.1, 7.0, 5.6                         | 7.1           | The php version to use                                                       |
+| `MOODLE_DOCKER_PHP_VERSION`               | no        | 7.4, 7.3, 7.2, 7.1, 7.0, 5.6          | 7.2           | The php version to use                                                       |
 | `MOODLE_DOCKER_BROWSER`                   | no        | firefox, chrome                       | firefox       | The browser to run Behat against                                             |
 | `MOODLE_DOCKER_PHPUNIT_EXTERNAL_SERVICES` | no        | any value                             | not set       | If set, dependencies for memcached, redis, solr, and openldap are added      |
 | `MOODLE_DOCKER_WEB_HOST`                  | no        | any valid hostname                    | localhost     | The hostname for web                                |

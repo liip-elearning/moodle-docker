@@ -33,7 +33,10 @@ if [ -r "$MOODLE_DOCKER_WWWROOT/projectinfo.yml" ]; then
 fi
 
 if [ -z "${MOODLE_CODENAME}" ]; then
-    >&2 echo 'Error: $MOODLE_CODENAME not specified; make sure to either set the environment, or use .moodle-compose.env'
+    >&2 echo 'Error: $MOODLE_CODENAME not set'
+    >&2 echo '       It should be set either in:'
+    >&2 echo '        - the environment (export MOODLE_CODENAME=)'
+    >&2 echo '        - projectinfo.yml (codename:)'
     exit 1
 fi
 
