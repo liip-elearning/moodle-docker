@@ -84,6 +84,14 @@ if [ -n "$1" ]; then
         ARGS="exec webserver php admin/cli/purge_caches.php"
         shift 1
         ;;
+    adhoc_tasks|at)
+        ARGS="exec webserver php admin/tool/task/cli/adhoc_task.php --execute"
+        shift 1
+        ;;
+    cron|c)
+        ARGS="exec webserver php admin/cli/cron.php"
+        shift 1
+        ;;
     esac
 fi
 
