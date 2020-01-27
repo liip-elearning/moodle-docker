@@ -44,7 +44,6 @@ Further info in the Readme file of the Moodle directory.
 #### In addition to all docker-compose commands listed above, you also get:
 ```bash
 # To stop all containers without losing your data
-
 moodle-compose stop
 
 # To destroy all containers but keep volumes and networks
