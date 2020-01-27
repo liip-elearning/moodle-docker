@@ -15,6 +15,7 @@ This repository contains Docker configuration aimed at Moodle developers and tes
 ## Prerequisites
 * [Docker](https://docs.docker.com) and [Docker Compose](https://docs.docker.com/compose/) installed
 * 3.25GB of RAM (if you choose [Microsoft SQL Server](https://docs.microsoft.com/en-us/sql/linux/sql-server-linux-setup#prerequisites) as db server)
+* For MacOS user make sure you have [coreutils](https://www.gnu.org/software/coreutils/coreutils.html) installed through Homebrew or Macports.
 
 ## Liip Quick start
 ```bash
