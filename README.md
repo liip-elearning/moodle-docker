@@ -57,6 +57,9 @@ moodle-compose c (moodle-compose cron)
 
 # To run the ad-hoc tasks
 moodle-compose at (moodle-compose adhoc_tasks) 
+
+# To restore a Postres db dump 
+moodle-compose pgr [filename.dbdump] (moodle-compose pgr [filename.dbdump]) 
 ```
 
 

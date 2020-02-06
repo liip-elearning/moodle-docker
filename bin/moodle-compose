@@ -61,6 +61,7 @@ if ! [ -r ./config.php ] || ! diff -q $MOODLE_DOCKER_DIR/config.docker-template.
 fi
 
 ARGS=
+dump=
 
 if [ -n "$1" ]; then
     case $1 in
@@ -92,7 +93,36 @@ if [ -n "$1" ]; then
         ARGS="exec webserver php admin/cli/cron.php"
         shift 1
         ;;
+    pgrestore|pgr)
+        if [ -z $2  ]; then
+	        echo "Insert the name of the pgdump file: "
+	        read dump
+        else
+	        dump=$2
+        fi
+        clear
+        printf "\n>>> Copying the pgdump file to the ${MOODLE_CODENAME}_db_1  volume\n------------------------------------------------------\n"
+        # It depends on Python, but who does not have it this days?
+        destination_folder=$(docker inspect -f '{{ json .Mounts }}' ${MOODLE_CODENAME}_db_1 | python -m json.tool | grep Destination | cut -d':' -f2 | cut -d'"' -f2)
+        date=$(date +%Y%m%d)
+        filename=${destination_folder}/${MOODLE_CODENAME}.${date}.${dump}
+        printf "${filename}\n"
+        docker cp ${dump} ${MOODLE_CODENAME}_db_1:${filename}
+        printf "\n>>> Removing the moodle DB\n--------------------------\n"
+        docker exec -t ${MOODLE_CODENAME}_db_1 /usr/bin/dropdb -e -U moodle moodle
+        printf "\n>>> Recreating the DB moodle from template0\n-------------------------------------------\n"
+        docker exec -t ${MOODLE_CODENAME}_db_1 /usr/bin/createdb -e -U moodle --template=template0 --owner=moodle moodle
+        printf "\n>>> Restoring the moodle DB with the pgdump file (Chill for a while)\n--------------------------------------------------------------------\n"
+        docker exec ${MOODLE_CODENAME}_db_1 /usr/bin/pg_restore -U moodle -d moodle --no-owner ${filename} && echo ""
+        printf "\n>>> DB restored! Removing the pgdump file...\n"
+        docker exec ${MOODLE_CODENAME}_db_1 rm ${filename}
+        printf "\n>>> Updating moodle DB\n----------------------\n"
+        moodle-compose u
+        printf "\n>>> Purging the Moodle cache\n----------------------------\n"
+        moodle-compose pc
+        printf "\nMoodle is ready => http://${MOODLE_CODENAME}.docker.test\n"
+        exit 1
+        ;;
     esac
 fi
-
 $MOODLE_DOCKER_DIR/bin/moodle-docker-compose $ARGS "$@"
