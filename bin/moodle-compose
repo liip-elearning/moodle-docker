@@ -101,24 +101,15 @@ if [ -n "$1" ]; then
 	        dump=$2
         fi
         clear
-        printf "\n>>> Copying the pgdump file to the ${MOODLE_CODENAME}_db_1  volume\n------------------------------------------------------\n"
-        # It depends on Python, but who does not have it this days?
-        destination_folder=$(docker inspect -f '{{ json .Mounts }}' ${MOODLE_CODENAME}_db_1 | python -m json.tool | grep Destination | cut -d':' -f2 | cut -d'"' -f2)
-        date=$(date +%Y%m%d)
-        filename=${destination_folder}/${MOODLE_CODENAME}.${date}.${dump}
-        printf "${filename}\n"
-        docker cp ${dump} ${MOODLE_CODENAME}_db_1:${filename}
-        printf "\n>>> Removing the moodle DB\n--------------------------\n"
-        docker exec -t ${MOODLE_CODENAME}_db_1 /usr/bin/dropdb -e -U moodle moodle
-        printf "\n>>> Recreating the DB moodle from template0\n-------------------------------------------\n"
-        docker exec -t ${MOODLE_CODENAME}_db_1 /usr/bin/createdb -e -U moodle --template=template0 --owner=moodle moodle
-        printf "\n>>> Restoring the moodle DB with the pgdump file (Chill for a while)\n--------------------------------------------------------------------\n"
-        docker exec ${MOODLE_CODENAME}_db_1 /usr/bin/pg_restore -U moodle -d moodle --no-owner ${filename} && echo ""
-        printf "\n>>> DB restored! Removing the pgdump file...\n"
-        docker exec ${MOODLE_CODENAME}_db_1 rm ${filename}
-        printf "\n>>> Updating moodle DB\n----------------------\n"
+        printf "\n>>> Removing the Moodle DB\n\n"
+        moodle-compose exec -T db /usr/bin/dropdb -e -U moodle moodle
+        printf "\n>>> Recreating the Moodle DB from template0\n\n"
+        moodle-compose exec -T db /usr/bin/createdb -e -U moodle -T template0 -O moodle moodle
+        printf "\n>>> Restoring the Moodle DB with the pgdump file (Chill for a while)\n\n"
+        cat $dump | moodle-compose exec -T db /usr/bin/pg_restore -U moodle -d moodle --no-owner && echo ""
+        printf "\n>>> Moodle DB restored!\n\n>>> Updating Moodle DB\n\n"
         moodle-compose u
-        printf "\n>>> Purging the Moodle cache\n----------------------------\n"
+        printf "\n>>> Purging the Moodle cache\n\n"
         moodle-compose pc
         printf "\nMoodle is ready => http://${MOODLE_CODENAME}.docker.test\n"
         exit 1
