@@ -4,7 +4,7 @@
 This repository contains Docker configuration aimed at Moodle developers and testers to easily deploy a testing environment for Moodle.
 
 ## Features:
-* All supported database servers (PostgreSQL, MySQL, Micosoft SQL Server, Oracle XE)
+* All supported database servers (PostgreSQL, MySQL, Microsoft SQL Server, Oracle XE)
 * Behat/Selenium configuration for Firefox and Chrome
 * Catch-all smtp server and web interface to messages using [MailHog](https://github.com/mailhog/MailHog/)
 * All PHP Extensions enabled configured for external services (e.g. solr, ldap)
@@ -15,6 +15,7 @@ This repository contains Docker configuration aimed at Moodle developers and tes
 ## Prerequisites
 * [Docker](https://docs.docker.com) and [Docker Compose](https://docs.docker.com/compose/) installed
 * 3.25GB of RAM (if you choose [Microsoft SQL Server](https://docs.microsoft.com/en-us/sql/linux/sql-server-linux-setup#prerequisites) as db server)
+* For MacOS user make sure you have [coreutils](https://www.gnu.org/software/coreutils/coreutils.html) installed through Homebrew or Macports.
 
 ## Liip Quick start
 ```bash
@@ -26,31 +27,39 @@ ln -s ~/opt/moodle-docker/bin/moodle-compose ~/.local/bin/
 
 # Go to your Moodle directory and fire up all containers
 moodle-compose up -d
+```
 
-# To stop all containers
-moodle-compose down
+#### If you're setting up the Moodle instance for the first time: 
+
+1. Adjust the project info in the Moodle directory by copying the **projectinfo-dist.yml** to **projectinfo.yml** and filling all the client related data.
+
+2. Install Moodle:  ```moodle-compose i (moodle-compose install)```
+3. Upgrade it:  ```moodle-compose u (moodle-compose upgrade)```
+4. Purge the caches: ```moodle-compose pc (moodle-compose purge_caches)```
+
+You should now have a instance available at **https://{codename}.docker.test/**
+
+Further info in the Readme file of the Moodle directory.
+
+
+#### In addition to all docker-compose commands listed above, you also get:
+```bash
+# To stop all containers without losing your data
+moodle-compose stop
 
 # To destroy all containers but keep volumes and networks
 moodle-compose rm -s
 
 # To destroy all containers, volumes and networks
 moodle-compose down
+
+# To run the cron
+moodle-compose c (moodle-compose cron)
+
+# To run the ad-hoc tasks
+moodle-compose at (moodle-compose adhoc_tasks) 
 ```
 
-In addition to all docker-compose commands listed above, you also get:
-```bash
-# Run Moodle installation
-moodle-compose install
-moodle-compose i
-
-# Run Moodle upgrade
-moodle-compose upgrade
-moodle-compose u
-
-# Purge Moodle caches
-moodle-compose purge_caches
-moodle-compose pc
-```
 
 ## Quick start
 
