@@ -100,6 +100,10 @@ if [ -n "$1" ]; then
         else
 	        dump=$2
         fi
+        if [ ! -f $dump ]; then
+          >&2  printf "\n>> File $dump not found\n\n"
+          exit 1
+        fi
         clear
         printf "\n>>> Removing the Moodle DB\n\n"
         moodle-compose exec -T db /usr/bin/dropdb -e -U moodle moodle
