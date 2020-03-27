@@ -136,16 +136,16 @@ if [ -n "$1" ]; then
     mysqlrestore|mysqlr)
         #  Note: Restoring large mysql dumps might crash at some point (e.g EPFL: ~4Gb)
         #  If it is the case this is the proven manual procedure:
-        #     docker cp [dump.sql] mdl-epfl_db_1:/var/lib/mysql/[dump.sql] # Not compressed!
+        #     docker cp [dump.sql] ${MOODLE_CODENAME}_db_1:/var/tmp/[dump.sql] # Not compressed!
         #     docker exec -it ${MOODLE_CODENAME}_db_1 bash
         #     mysql -pm@0dl3ing
         #     SET GLOBAL max_allowed_packet=16*1024*1024;
         #     quit;
         #     mysql -pm@0dl3ing
         #     USE moodle;
-        #     source /var/lib/mysql/[dump.sql]
+        #     source /var/tmp/[dump.sql]
         #     quit;
-        #     rm -f /var/lib/mysql/[dump.sql]
+        #     rm -f /var/tmp/[dump.sql]
         #     exit
         #     moodle-compose u
         #     moodle-compose pc
@@ -199,6 +199,8 @@ else
     mysqlrestore|mysqlr     Restore MYSQL Moodle DB from .sql.gz file
     mysqllocaldump|mysqlld  Dump the local MYSQL Moodle DB to [MOODLE_CODENAME]_local_dbdump.sql.gz
 
+    Also, all docker-compose commands will work as well, for instance:
+        moodle-compose exec webserver bash
     "
   exit 1
 fi
