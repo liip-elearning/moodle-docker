@@ -29,6 +29,12 @@ ln -s ~/opt/moodle-docker/bin/moodle-compose ~/.local/bin/
 moodle-compose up -d
 ```
 
+## Working with MYSQL
+If it is the case, just ensure the projectinfo.yml contains the key: value
+```
+sqltype: mysql
+```
+
 #### If you're setting up the Moodle instance for the first time: 
 
 1. Adjust the project info in the Moodle directory by copying the **projectinfo-dist.yml** to **projectinfo.yml** and filling all the client related data.
@@ -62,13 +68,13 @@ moodle-compose at (moodle-compose adhoc_tasks)
 # To restore a Postgres DB dump
 moodle-compose pgr [filename.dbdump] (moodle-compose pgrestore [filename.dbdump])
 
-# To restore a Mysql DB dump (Make sure you are on the moodle-compose's "MYSQL" branch)
+# To restore a Mysql DB dump
 moodle-compose mysqlr [filename.sql.gz] (moodle-compose mysqlrestore [filename.sql.gz])
 
 # To dump a snapshot of the local Postgres DB into [MOODLE_CODENAME]_local_dbdump.pgdump
 moodle-compose pgld (moodle-compose pglocaldump)
 
-# To dump a snapshot of the local Mysql DB nto [MOODLE_CODENAME]_local_dbdump.sql.gz
+# To dump a snapshot of the local Mysql DB into [MOODLE_CODENAME]_local_dbdump.sql.gz
 moodle-compose mysqlld (moodle-compose mysqllocaldump)
 
 ```
