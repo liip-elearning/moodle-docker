@@ -57,10 +57,20 @@ moodle-compose down
 moodle-compose c (moodle-compose cron)
 
 # To run the ad-hoc tasks
-moodle-compose at (moodle-compose adhoc_tasks) 
+moodle-compose at (moodle-compose adhoc_tasks)
 
-# To restore a Postres db dump 
-moodle-compose pgr [filename.dbdump] (moodle-compose pgr [filename.dbdump]) 
+# To restore a Postgres DB dump
+moodle-compose pgr [filename.dbdump] (moodle-compose pgrestore [filename.dbdump])
+
+# To restore a Mysql DB dump (Make sure you are on the moodle-compose's "MYSQL" branch)
+moodle-compose mysqlr [filename.sql.gz] (moodle-compose mysqlrestore [filename.sql.gz])
+
+# To dump a snapshot of the local Postgres DB into [MOODLE_CODENAME]_local_dbdump.pgdump
+moodle-compose pgld (moodle-compose pglocaldump)
+
+# To dump a snapshot of the local Mysql DB nto [MOODLE_CODENAME]_local_dbdump.sql.gz
+moodle-compose mysqlld (moodle-compose mysqllocaldump)
+
 ```
 
 
