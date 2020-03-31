@@ -128,13 +128,13 @@ if [ -n "$1" ]; then
     pglocaldump|pgld)
         # Useful to have a local snapshot of DB after some work (specially upgrading the db, which could be time burner)
         filename="${MOODLE_CODENAME}_local_dbdump.pgdump"
-        moodle-compose exec -T db /usr/bin/pg_dump -U moodle --format=custom -f ${filename} moodle
+        moodle-compose exec -T db /usr/bin/pg_dump -U moodle --format=custom moodle > ${filename}
         printf "\nMoodle local DB has been dumped => ${filename}"
         exit 1
         ;;
 
     mysqlrestore|mysqlr)
-        #  Note: Restoring large mysql dumps might crash at some point (e.g EPFL: ~4Gb)
+        #  Note: Restoring large mysql dumps might crash at some point (e.g ~4Gb)
         #  If it is the case this is the proven manual procedure:
         #     docker cp [dump.sql] ${MOODLE_CODENAME}_db_1:/var/tmp/[dump.sql] # Not compressed!
         #     docker exec -it ${MOODLE_CODENAME}_db_1 bash
