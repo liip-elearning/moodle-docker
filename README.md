@@ -34,7 +34,7 @@ If it is the case, just ensure the projectinfo.yml contains the key: value
 ```
 sqltype: mysql
 ```
-####Note on restoring large mysql dumps
+###Note on restoring large mysql dumps
  It might crash at some for dumps > 2Gb. If it is the case this is the proven manual procedure:
 ```
 docker cp [dump.sql] ${MOODLE_CODENAME}_db_1:/var/tmp/[dump.sql] # Not compressed!
