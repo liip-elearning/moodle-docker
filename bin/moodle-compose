@@ -136,19 +136,15 @@ if [ -n "$1" ]; then
     mysqlrestore|mysqlr)
         #  Note: Restoring large mysql dumps might crash at some point (e.g ~4Gb)
         #  If it is the case this is the proven manual procedure:
-        #     docker cp [dump.sql] ${MOODLE_CODENAME}_db_1:/var/tmp/[dump.sql] # Not compressed!
-        #     docker exec -it ${MOODLE_CODENAME}_db_1 bash
-        #     mysql -pm@0dl3ing
+        #   gunzip < [dump.sql.gz] | moodle-compose exec -T db tee /var/tmp/dump.sql > /dev/null
+        #   moodle-compose exec db bash
+        #    mysql -pm@0dl3ing
         #     SET GLOBAL max_allowed_packet=16*1024*1024;
         #     quit;
-        #     mysql -pm@0dl3ing
-        #     USE moodle;
-        #     source /var/tmp/[dump.sql]
-        #     quit;
-        #     rm -f /var/tmp/[dump.sql]
-        #     exit
-        #     moodle-compose u
-        #     moodle-compose pc
+        #    grep -Ev "INSERT INTO \`.*_logstore_standard" /var/tmp/dump.sql | grep -v 'CHANGE MASTER' | mysql -p$MYSQL_PASSWORD moodle -v
+        #    exit
+        #   moodle-compose u
+        #   moodle-compose pc
         #
         #                            Try at your own risk! Feel free to improve it!
 
