@@ -29,6 +29,31 @@ ln -s ~/opt/moodle-docker/bin/moodle-compose ~/.local/bin/
 moodle-compose up -d
 ```
 
+## Working with MYSQL
+If it is the case, just ensure the projectinfo.yml contains the key: value
+```
+sqltype: mysql
+```
+###Note on restoring large mysql dumps
+ It might crash at some for dumps > 2Gb. If it is the case this is the proven manual procedure:
+```
+docker cp [dump.sql] ${MOODLE_CODENAME}_db_1:/var/tmp/[dump.sql] # Not compressed!
+docker exec -it ${MOODLE_CODENAME}_db_1 bash
+mysql -pm@0dl3ing
+SET GLOBAL max_allowed_packet=16*1024*1024;
+quit;
+mysql -pm@0dl3ing
+USE moodle;
+source /var/tmp/[dump.sql]
+quit;
+rm -f /var/tmp/[dump.sql]
+exit
+moodle-compose u
+moodle-compose pc
+```
+*Try at your own risk! :)  Just feel free to try it and share any improvement!*
+
+
 #### If you're setting up the Moodle instance for the first time: 
 
 1. Adjust the project info in the Moodle directory by copying the **projectinfo-dist.yml** to **projectinfo.yml** and filling all the client related data.
@@ -42,8 +67,11 @@ You should now have a instance available at **https://{codename}.docker.test/**
 Further info in the Readme file of the Moodle directory.
 
 
-#### In addition to all docker-compose commands listed above, you also get:
+#### In addition to all docker-compose and moodle-docker-compose commands, you also get:
 ```bash
+# Quick help
+moodle-compose
+
 # To stop all containers without losing your data
 moodle-compose stop
 
@@ -57,12 +85,24 @@ moodle-compose down
 moodle-compose c (moodle-compose cron)
 
 # To run the ad-hoc tasks
-moodle-compose at (moodle-compose adhoc_tasks) 
+moodle-compose at (moodle-compose adhoc_tasks)
+
+# To restore a Postgres DB dump
+moodle-compose pgr [filename.dbdump] (moodle-compose pgrestore [filename.dbdump])
+
+# To restore a Mysql DB dump
+moodle-compose mysqlr [filename.sql.gz] (moodle-compose mysqlrestore [filename.sql.gz])
+
+# To dump a snapshot of the local Postgres DB into [MOODLE_CODENAME]_local_dbdump.pgdump
+moodle-compose pgld (moodle-compose pglocaldump)
+
+# To dump a snapshot of the local Mysql DB into [MOODLE_CODENAME]_local_dbdump.sql.gz
+moodle-compose mysqlld (moodle-compose mysqllocaldump)
 ```
 
 
 ## Quick start
-
+(Original from moodle-docker-compose)
 ```bash
 # Set up path to Moodle code
 export MOODLE_DOCKER_WWWROOT=/path/to/moodle/code
