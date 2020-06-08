@@ -75,6 +75,7 @@ if [ -n "$1" ]; then
         # Standard local installation
         ARGS="exec webserver php admin/cli/install_database.php"
         ARGS="$ARGS --agree-license"
+        ARGS="$ARGS --allow-unstable"
         ARGS="$ARGS --fullname=${MOODLE_CODENAME}"
         ARGS="$ARGS --shortname=${MOODLE_CODENAME}"
         ARGS="$ARGS --adminemail=admin@${MOODLE_DOCKER_WEB_HOST}"
@@ -85,6 +86,7 @@ if [ -n "$1" ]; then
     upgrade|u)
         ARGS="exec webserver php admin/cli/upgrade.php"
         ARGS="$ARGS --non-interactive"
+        ARGS="$ARGS --allow-unstable"
         shift 1
         ;;
     purge_caches|pc)
