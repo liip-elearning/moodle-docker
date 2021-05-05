@@ -1,7 +1,7 @@
 version: "2"
 services:
   themedevel:
-    image: "node:latest"
+    image: "node:15" # node-sass doesn't support node 16 https://github.com/sass/node-sass/issues/3077
     depends_on:
       - webserver
     volumes:
