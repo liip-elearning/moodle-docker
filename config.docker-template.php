@@ -32,6 +32,20 @@ if (!empty(getenv('MOODLE_DOCKER_TRAEFIK'))) {
         $CFG->wwwroot .= ":{$port}";
     }
 }
+
+$themedevel = getenv('MOODLE_DOCKER_THEMEDEVEL');
+if (!empty($themedevel)) {
+    $CFG->theme = $themedevel;
+    $CFG->devel_custom_additional_head = '<link rel="stylesheet" type="text/css" href="/theme/' . $themedevel . '/build/stylesheets/compiled.css" />';
+
+    $webhost = getenv('MOODLE_DOCKER_BROWSERSYNC_WEBHOST');
+    if (!empty($webhost)) {
+        $CFG->browsersyncurl = 'https://'.$webhost;
+        $CFG->wwwroot = 'https://'.$webhost;
+        $CFG->reverseproxy = true;
+    }
+}
+
 $CFG->dataroot  = '/var/www/moodledata';
 $CFG->admin     = 'admin';
 $CFG->directorypermissions = 0777;
