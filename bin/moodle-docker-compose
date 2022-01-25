@@ -32,7 +32,7 @@ dockercompose="${dockercompose} -f ${basedir}/service.mail.yml"
 export MOODLE_DOCKER_PHP_VERSION=${MOODLE_DOCKER_PHP_VERSION:-7.3}
 
 # Enable Traefik
-if [ -n "$MOODLE_DOCKER_TRAEFIK" ];
+if [ "$MOODLE_DOCKER_TRAEFIK" == "enable" ];
 then
     dockercompose="${dockercompose} -f ${basedir}/traefik.yml"
 fi
