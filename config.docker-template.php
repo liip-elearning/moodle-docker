@@ -51,7 +51,7 @@ $CFG->pathtophp = '/usr/local/bin/php';
 
 $CFG->phpunit_dataroot  = '/var/www/phpunitdata';
 $CFG->phpunit_prefix = 't_';
-define('TEST_EXTERNAL_FILES_HTTP_URL', 'http://exttests');
+define('TEST_EXTERNAL_FILES_HTTP_URL', 'http://exttests:9000');
 
 $CFG->behat_wwwroot   = 'http://webserver';
 $CFG->behat_dataroot  = '/var/www/behatdata';
@@ -67,7 +67,9 @@ $CFG->behat_faildump_path = '/var/www/behatfaildumps';
 define('PHPUNIT_LONGTEST', true);
 
 if (getenv('MOODLE_DOCKER_APP')) {
-    $CFG->behat_ionic_wwwroot = 'http://moodleapp:8100';
+    $appport = getenv('MOODLE_DOCKER_APP_PORT') ?: 8100;
+
+    $CFG->behat_ionic_wwwroot = "http://moodleapp:$appport";
 }
 
 if (getenv('MOODLE_DOCKER_PHPUNIT_EXTRAS')) {
