@@ -13,7 +13,7 @@ This repository contains Docker configuration aimed at Moodle developers and tes
 * Backed by [automated tests](https://travis-ci.com/moodlehq/moodle-docker/branches)
 
 ## Prerequisites
-* [Docker](https://docs.docker.com) and [Docker Compose](https://docs.docker.com/compose/) installed
+* [Docker](https://docs.docker.com) and [Docker Compose](https://docs.docker.com/compose/cli-command/#installing-compose-v2) installed if your Docker CLI version does not support `docker compose` command.
 * 3.25GB of RAM (if you choose [Microsoft SQL Server](https://docs.microsoft.com/en-us/sql/linux/sql-server-linux-setup#prerequisites) as db server)
 * For MacOS user make sure you have [coreutils](https://www.gnu.org/software/coreutils/coreutils.html) installed through Homebrew or Macports.
 
@@ -194,7 +194,14 @@ OK (2 tests, 7 assertions)
 ```
 
 Notes:
-* If you want to run test with coverage report, use command: `bin/moodle-docker-compose exec webserver phpdbg -qrr vendor/bin/phpunit --coverage-text auth_manual_testcase auth/manual/tests/manual_test.php`
+* If you want to run tests with code coverage reports:
+```
+# Build component configuration
+bin/moodle-docker-compose exec webserver php admin/tool/phpunit/cli/util.php --buildcomponentconfigs
+# Execute tests for component
+bin/moodle-docker-compose exec webserver php -d pcov.enabled=1 -d pcov.directory=. vendor/bin/phpunit --configuration reportbuilder --coverage-text
+```
+* See available [Command-Line Options](https://phpunit.readthedocs.io/en/9.5/textui.html#textui-clioptions) for further info
 
 ## Use containers for manual testing
 
@@ -222,7 +229,7 @@ For both options, you also need to set `MOODLE_DOCKER_BROWSER` to "chrome".
 
 ```bash
 # Install local_moodlemobileapp plugin
-git clone git://github.com/moodlehq/moodle-local_moodlemobileapp "$MOODLE_DOCKER_WWWROOT/local/moodlemobileapp"
+git clone https://github.com/moodlehq/moodle-local_moodlemobileapp "$MOODLE_DOCKER_WWWROOT/local/moodlemobileapp"
 
 # Initialize behat environment
 bin/moodle-docker-compose exec webserver php admin/tool/behat/cli/init.php
@@ -248,8 +255,7 @@ If you are going with the second option, this *can* be used for local developmen
 By all means, if you don't want to have npm installed locally you can go full Docker executing the following commands before starting the containers:
 
 ```
-docker run --volume $MOODLE_DOCKER_APP_PATH:/app --workdir /app node:14 npm install
-docker run --volume $MOODLE_DOCKER_APP_PATH:/app --workdir /app node:14 npm run setup
+docker run --volume $MOODLE_DOCKER_APP_PATH:/app --workdir /app bash -c "npm install npm@7 -g && npm ci"
 ```
 
 You can learn more about writing tests for the app in [Acceptance testing for the Moodle App](https://docs.moodle.org/dev/Acceptance_testing_for_the_Moodle_App).
@@ -284,7 +290,7 @@ When you change them, use `bin/moodle-docker-compose down && bin/moodle-docker-c
 |-------------------------------------------|-----------|---------------------------------------|---------------|------------------------------------------------------------------------------|
 | `MOODLE_DOCKER_DB`                        | yes       | pgsql, mariadb, mysql, mssql, oracle  | none          | The database server to run against                                           |
 | `MOODLE_DOCKER_WWWROOT`                   | yes       | path on your file system              | none          | The path to the Moodle codebase you intend to test                           |
-| `MOODLE_DOCKER_PHP_VERSION`               | no        | 7.4, 7.3, 7.2, 7.1, 7.0, 5.6          | 7.3           | The php version to use                                                       |
+| `MOODLE_DOCKER_PHP_VERSION`               | no        | 8.0, 7.4, 7.3, 7.2, 7.1, 7.0, 5.6     | 7.4           | The php version to use                                                       |
 | `MOODLE_DOCKER_BROWSER`                   | no        | firefox, chrome,  firefox:&lt;tag&gt;, chrome:&lt;tag&gt; | firefox:3       | The browser to run Behat against. Supports a colon notation to specify a specific Selenium docker image version to use. e.g. firefox:2.53.1 can be used to run with older versions of Moodle (<3.5)              |
 | `MOODLE_DOCKER_PHPUNIT_EXTERNAL_SERVICES` | no        | any value                             | not set       | If set, dependencies for memcached, redis, solr, and openldap are added      |
 | `MOODLE_DOCKER_BEHAT_FAILDUMP`            | no        | Path on your file system              | not set       | Behat faildumps are already available at http://localhost:8000/_/faildumps/ by default, this allows for mapping a specific filesystem folder to retrieve the faildumps in bulk / automated ways |
@@ -339,8 +345,8 @@ moodle-docker-compose restart webserver
 ## Advanced usage
 
 As can be seen in [bin/moodle-docker-compose](https://github.com/moodlehq/moodle-docker/blob/master/bin/moodle-docker-compose),
-this repo is just a series of docker-compose configurations and light wrapper which make use of companion docker images. Each part
-is designed to be reusable and you are encouraged to use the docker[-compose] commands as needed.
+this repo is just a series of Docker Compose configurations and light wrapper which make use of companion docker images. Each part
+is designed to be reusable and you are encouraged to use the docker [compose] commands as needed.
 
 ## Companion docker images
 
