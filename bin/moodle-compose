@@ -66,6 +66,13 @@ if ! [ -r ./config.php ] || ! diff -q $MOODLE_DOCKER_DIR/config.docker-template.
     cp $MOODLE_DOCKER_DIR/config.docker-template.php ./config.php
 fi
 
+ADMINEMAIL="admin@${MOODLE_DOCKER_WEB_HOST}"
+# In case the web host isn't a valid domain
+if [[ "${MOODLE_DOCKER_WEB_HOST}" != *"."* ]]
+then
+  ADMINEMAIL="admin@${MOODLE_DOCKER_WEB_HOST}.test"
+fi
+
 ARGS=
 dump=
 
@@ -77,7 +84,7 @@ if [ -n "$1" ]; then
         ARGS="$ARGS --agree-license"
         ARGS="$ARGS --fullname=${MOODLE_CODENAME}"
         ARGS="$ARGS --shortname=${MOODLE_CODENAME}"
-        ARGS="$ARGS --adminemail=admin@${MOODLE_DOCKER_WEB_HOST}"
+        ARGS="$ARGS --adminemail=${ADMINEMAIL}"
         ARGS="$ARGS --adminuser=admin"
         ARGS="$ARGS --adminpass=adminadmin"
         shift 1
