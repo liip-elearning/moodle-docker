@@ -1,0 +1,38 @@
+version: "2"
+services:
+  themedevel:
+    image: "node:15" # node-sass doesn't support node 16 https://github.com/sass/node-sass/issues/3077
+    depends_on:
+      - webserver
+    volumes:
+      - "${MOODLE_DOCKER_WWWROOT}:/var/www/html"
+      - "/var/www/html/theme/${MOODLE_DOCKER_THEMEDEVEL}/node_modules"
+      - "themebuild:/var/www/html/theme/${MOODLE_DOCKER_THEMEDEVEL}/build"
+    working_dir: /var/www/html/theme/${MOODLE_DOCKER_THEMEDEVEL}
+    command: bash -c "npm install && npm run start"
+    ports:
+      - 3000
+      - 3001
+    environment:
+      - MOODLE_DOCKER_THEMEDEVEL=${MOODLE_DOCKER_THEMEDEVEL}
+      - MOODLE_DOCKER_BROWSERSYNC_WEBHOST=browsersync.${MOODLE_DOCKER_WEB_HOST}
+      - MOODLE_DOCKER_WEBSERVER_INTERNAL=webserver_for_themedevel
+    labels:
+      - "traefik.enable=true"
+      - "traefik.frontend.rule=Host:browsersync.${MOODLE_DOCKER_WEB_HOST}"
+      - 'traefik.docker.network=pontsun'
+    networks:
+      - default
+      - pontsun
+  webserver:
+    environment:
+      - MOODLE_DOCKER_THEMEDEVEL=${MOODLE_DOCKER_THEMEDEVEL}
+      - MOODLE_DOCKER_BROWSERSYNC_WEBHOST=browsersync.${MOODLE_DOCKER_WEB_HOST}
+    networks:
+      default:
+          aliases:
+              - webserver_for_themedevel
+    volumes:
+      - "themebuild:/var/www/html/theme/${MOODLE_DOCKER_THEMEDEVEL}/build"
+volumes:
+    themebuild:

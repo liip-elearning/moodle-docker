@@ -38,6 +38,12 @@ dockercompose="${dockercompose} -f ${basedir}/service.mail.yml"
 # PHP Version.
 export MOODLE_DOCKER_PHP_VERSION=${MOODLE_DOCKER_PHP_VERSION:-7.4}
 
+# Enable Theme developement mode (specify the theme _name_ in that variable
+if [ -n "$MOODLE_DOCKER_THEMEDEVEL" ];
+then
+    dockercompose="${dockercompose} -f ${basedir}/themedevel.yml"
+fi
+
 # Enable Traefik
 if [ "$MOODLE_DOCKER_TRAEFIK" == "enable" ];
 then
